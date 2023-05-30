@@ -4,9 +4,9 @@ app = Flask(__name__)
 
 # Dummy data for tasks
 tasks = [
-    {"id": 1, "title": "Task 1", "description": "Description for Task 1"},
-    {"id": 2, "title": "Task 2", "description": "Description for Task 2"},
-    {"id": 3, "title": "Task 3", "description": "Description for Task 3"}
+    {"id": 1, "title": "python env", "description": "mata kuliah pembuka"},
+    {"id": 2, "title": "dummy data", "description": "data dummy show"},
+    {"id": 3, "title": "pemograman", "description": "dasar dasar algorith"}
 ]
 
 

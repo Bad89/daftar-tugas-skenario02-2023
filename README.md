@@ -1,4 +1,4 @@
-## skenario 02 / daftar tugas 2023 badeasaputro@gmail.com
+## skenario 02 / daftar tugas 2023 
 
 
 - run:

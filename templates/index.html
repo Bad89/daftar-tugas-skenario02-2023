@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>DAFTAR TUGAS badeailham@gmail.com</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h1>Daftar tugas</h1>
+        <hr>
+
+        <form id="createTaskForm" class="mb-3">
+            <div class="form-group">
+                <label for="title">tugas</label>
+                <input type="text" class="form-control" id="title" required>
+            </div>
+            <div class="form-group">
+                <label for="description">detail tugas</label>
+                <textarea class="form-control" id="description" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">buat baru</button>
+        </form>
+
+        <table id="taskTable" class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>tugas</th>
+                    <th>detail tugas</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function fetchTasks() {
+            $.ajax({
+                url: '/tasks',
+                type: 'GET',
+                success: function (response) {
+                    var tasks = response;
+                    var taskRows = '';
+                    for (var i = 0; i < tasks.length; i++) {
+                        taskRows += '<tr>';
+                        taskRows += '<td>' + tasks[i].id + '</td>';
+                        taskRows += '<td>' + tasks[i].title + '</td>';
+                        taskRows += '<td>' + tasks[i].description + '</td>';
+                        taskRows += '<td><button class="btn btn-sm btn-primary" onclick="editTask(' + tasks[i].id + ')">Edit</button>';
+                        taskRows += '<button class="btn btn-sm btn-danger ml-2" onclick="deleteTask(' + tasks[i].id + ')">Delete</button></td>';
+                        taskRows += '</tr>';
+                    }
+                    $('#taskTable tbody').html(taskRows);
+                }
+            });
+        }
+
+        $('#createTaskForm').submit(function (e) {
+            e.preventDefault();
+            var title = $('#title').val();
+            var description = $('#description').val();
+            var data = {
+                "title": title,
+                "description": description
+            };
+            $.ajax({
+                url: '/tasks',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (response) {
+                    fetchTasks();
+                    $('#title').val('');
+                    $('#description').val('');
+                }
+            });
+        });
+
+        function deleteTask(taskId) {
+            if (confirm('Are you sure you want to delete this task?')) {
+                $.ajax({
+                    url: '/tasks/' + taskId,
+                    type: 'DELETE',
+                    success: function (response) {
+                        fetchTasks();
+                    }
+                });
+            }
+        }
+
+        function editTask(taskId) {
+            // Fetch the task data
+            $.ajax({
+                url: '/tasks/' + taskId,
+                type: 'GET',
+                success: function (response) {
+                    var task = response;
+                    // Populate the form fields for editing
+                    $('#title').val(task.title);
+                    $('#description').val(task.description);
+                    // Change the form submission to update the task
+                    $('#createTaskForm').unbind('submit').submit(function (e) {
+                        e.preventDefault();
+                        var updatedData = {
+                            "title": $('#title').val(),
+                            "description": $('#description').val()
+                        };
+                        $.ajax({
+                            url: '/tasks/' + taskId,
+                            type: 'PUT',
+                            contentType: 'application/json',
+                            data: JSON.stringify(updatedData),
+                            success: function (response) {
+                                fetchTasks();
+                                $('#title').val('');
+                                $('#description').val('');
+                                // Change the form submission back to create a new task
+                                $('#createTaskForm').unbind('submit').submit(function (e) {
+                                    e.preventDefault();
+                                    createTask();
+                                });
+                            }
+                        });
+                    });
+                }
+            });
+        }
+
+
+        fetchTasks();
+    </script>
+</body>
+
+</html>
